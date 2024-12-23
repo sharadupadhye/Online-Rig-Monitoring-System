@@ -1,0 +1,77 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\TestPlan;
+use App\Models\TestPlanRow;
+
+class TestPlanController extends Controller
+{
+    /**
+     * Show the form for creating test plans.
+     */
+    public function create()
+    {
+        return view('dynamic_tables');
+    }
+
+    /**
+     * Store the test plans and their rows in the database.
+     */
+    public function store(Request $request)
+    {
+        // Validate the request data
+        $validated = $request->validate([
+            'table_details' => 'required|array',
+            'table_details.*' => 'required|string|max:255',
+            'remarks' => 'nullable|array',
+            'shift_mode' => 'required|array',
+            'shift_mode.*' => 'required|array',
+            'rpm' => 'required|array',
+            'rpm.*' => 'required|array',
+            'target' => 'required|array',
+            'target.*' => 'required|array',
+            'block_target' => 'required|array',
+            'block_target.*' => 'required|array',
+            'block_1' => 'required|array',
+            'block_1.*' => 'required|array',
+            'block_2' => 'required|array',
+            'block_2.*' => 'required|array',
+            'block_3' => 'required|array',
+            'block_3.*' => 'required|array',
+            'block_4' => 'required|array',
+            'block_4.*' => 'required|array',
+        ]);
+
+        // Loop through each test plan
+        foreach ($request->table_details as $index => $details) {
+            // Create the test plan
+            $testPlan = TestPlan::create([
+                'details' => $details,
+                'remark' => $request->remarks[$index] ?? null,
+            ]);
+
+            // Prepare rows for the test plan
+            $rows = [];
+            foreach ($request->shift_mode[$index] as $rowIndex => $shiftMode) {
+                $rows[] = [
+                    'test_plan_id' => $testPlan->id,
+                    'shift_mode' => $shiftMode,
+                    'rpm' => $request->rpm[$index][$rowIndex],
+                    'target' => $request->target[$index][$rowIndex],
+                    'block_target' => $request->block_target[$index][$rowIndex],
+                    'block_1' => $request->block_1[$index][$rowIndex],
+                    'block_2' => $request->block_2[$index][$rowIndex],
+                    'block_3' => $request->block_3[$index][$rowIndex],
+                    'block_4' => $request->block_4[$index][$rowIndex],
+                ];
+            }
+
+            // Insert rows into the database
+            TestPlanRow::insert($rows);
+        }
+
+        return redirect()->back()->with('success', 'Test plans saved successfully!');
+    }
+}

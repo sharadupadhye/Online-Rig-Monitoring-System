@@ -1,0 +1,32 @@
+$validOptions = [
+    "SYNCHROCONE TEST RIG I",
+    "SYNCHROCONE TEST RIG II",
+    "SYNCHROCONE TEST RIG III",
+    "SYNCHROCONE TEST RIG IV",
+    "SYNCHROCONE TEST RIG V",
+    "SYNCHROCONE TEST RIG VI",
+    "CVT -I",
+    "CVT -II"
+];
+
+
+if (in_array($employee->options2, $validOptions)) {
+    define('sampleValue', option1);
+} else {
+   
+    define('sampleValue', null);
+}
+
+
+
+        
+
+          window.onload = function() {
+    
+
+    document.getElementById('options1').value = sampleValue;
+
+    
+    updateSecondDropdown(); 
+    showFields();            
+};

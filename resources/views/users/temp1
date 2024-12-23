@@ -1,0 +1,176 @@
+<!-- resources/views/users/index.blade.php -->
+
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight text-center">
+            {{ __('Registered Users') }}
+        </h2>
+    </x-slot>
+
+    <div class="py-4 d-flex align-items-center justify-content-center min-vh-100">
+        <div class="container">
+
+            <!-- Success and Error Messages -->
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show text-center mb-4" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show text-center mb-4" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            <!-- Register New User Button -->
+            <div class="text-center mb-4">
+                <a href="{{ route('register') }}" class="btn register-btn">
+                    {{ __('Register New User') }}
+                </a>
+            </div>
+
+            <!-- Users Table Container -->
+            <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg mx-auto p-8 w-full md:w-3/4 lg:w-2/3">
+                <div class="p-6">
+                    <h3 class="text-2xl font-semibold mb-6 text-gray-800 text-center">{{ __('Users List') }}</h3>
+
+                    <div class="overflow-x-auto">
+                        <table class="table table-bordered table-striped table-hover text-center align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" class="text-sm font-medium text-gray-700 border-b">{{ __('Name') }}</th>
+                                    <th scope="col" class="text-sm font-medium text-gray-700 border-b">{{ __('Email') }}</th>
+                                    <th scope="col" class="text-sm font-medium text-gray-700 border-b">{{ __('Role') }}</th>
+                                    <th scope="col" class="text-sm font-medium text-gray-700 border-b">{{ __('Actions') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($users as $user)
+                                    <tr class="hover:bg-gray-50 transition-all">
+                                        <td class="px-6 py-3 text-sm text-gray-800 border-b">{{ $user->name }}</td>
+                                        <td class="px-6 py-3 text-sm text-gray-800 border-b">{{ $user->email }}</td>
+                                        <td class="px-6 py-3 text-sm text-gray-800 border-b">{{ $user->role }}</td>
+                                        <td class="px-6 py-3 border-b text-center">
+                                            <!-- Check if the logged-in user is not the one to be deleted -->
+                                            @if ($user->id !== $currentUser->id)
+                                                <!-- Form for deleting user -->
+                                                <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn delete-btn">
+                                                        {{ __('Delete') }}
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <span class="text-muted">{{ __('Cannot delete yourself') }}</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom CSS for Button Styling -->
+    @push('css')
+        <style>
+            /* Import Roboto font */
+            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+            /* Apply Roboto font to the entire page */
+            body {
+                font-family: 'Roboto', sans-serif;
+                font-size: 1rem; /* Base font size */
+            }
+
+            /* Center the content vertically */
+            .min-vh-100 {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Style for the Register New User Button */
+            .register-btn {
+                background-color: #4CAF50; /* Green color */
+                color: #ffffff;
+                padding: 12px 24px;
+                font-size: 18px; /* Larger font size */
+                font-weight: bold;
+                border-radius: 5px;
+                text-transform: uppercase;
+                transition: background-color 0.3s ease, box-shadow 0.3s ease;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            .register-btn:hover {
+                background-color: #45A049; /* Darker green */
+                box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+            }
+
+            /* Style for Delete Button */
+            .delete-btn {
+                background-color: #e3342f; /* Red color */
+                color: white;
+                padding: 10px 20px;
+                font-size: 16px; /* Larger font size */
+                font-weight: bold;
+                border: none;
+                border-radius: 5px;
+                transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+            
+            .delete-btn:hover {
+                background-color: #cc1f1a;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+            }
+
+            .delete-btn:active {
+                background-color: #a71d2a;
+                box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2);
+            }
+
+            /* Table Styling */
+            table {
+                width: 100%;
+                border-spacing: 0;
+                border-collapse: collapse;
+                font-size: 16px; /* Larger font size */
+            }
+
+            th, td {
+                padding: 1.25rem; /* Increased padding for readability */
+                text-align: center;
+                border: 1px solid #e2e8f0;
+            }
+
+            th {
+                background-color: #f7fafc;
+                font-weight: 600;
+                color: #4a5568;
+            }
+
+            tr:hover {
+                background-color: #f1f5f9;
+            }
+
+            /* Responsive Table */
+            @media screen and (max-width: 768px) {
+                table {
+                    display: block;
+                    overflow-x: auto;
+                    white-space: nowrap;
+                }
+            }
+        </style>
+    @endpush
+</x-app-layout>
